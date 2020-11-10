@@ -41,7 +41,7 @@ week_10 <- kenya %>%
 
 * Write a sentence or two describing a situation in which RMSE would not be a good metric for choosing among models.
 
-* Write a sentence interpreting sigma. 
+* Write a sentence interpreting sigma. (Recall that, in the Bayesian/stan_glm() framework, sigma is just another parameter, and that the fitted model provides us with an estimated posterior for it.)
 
 
 

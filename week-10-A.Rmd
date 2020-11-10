@@ -37,13 +37,33 @@ week_10 <- kenya %>%
 
 * Fit the same stan_glm() model which we used on Thursday: `reg_chg` as a function of `treatment`, `poverty_n` and their interaction. Look at the results. 
 
+```{r}
+week10_model <- stan_glm(data = week_10, 
+                      reg_chg ~ treatment + poverty_n + treatment*poverty_n,
+                      refresh = 0) %>%
+  print(digits = 5)
+```
+
+$$regchg+ .021*treatmentlocal + .00266*poverty_n $$
+
 * The root mean square error (also known as RMSE or rmse) is the most common measure for how well a models fits the data. It is the square root of the average of the sum of the residuals squared. (Recall that the residual is defined as the true value minus the fitted value.) Calculate the RMSE by hand. (Hint: Use the `predict()` function with the fitted model object. This will give you the fitted values. Once you have the residual, you just square them, take the sum, and then take the square root of the sum.)
+
+```{r}
+
+find_rmse <- tibble(reality = week_10$reg_chg,
+       guess = predict(week10_model)) %>%
+  mutate(sq_dif = (guess - reality)^2) %>%
+  summarize(rmse = sqrt(mean(sq_dif))) %>%
+  metrics(truth = reality, estimate = `.pred`)
+
+```
+
 
 * Write a sentence or two describing a situation in which RMSE would not be a good metric for choosing among models.
 
 * Write a sentence interpreting sigma. (Recall that, in the Bayesian/stan_glm() framework, sigma is just another parameter, and that the fitted model provides us with an estimated posterior for it.)
 
-
+Sigma is the variability in the registration change (reg_chg)
 
 
 ## Scene 2
@@ -54,6 +74,30 @@ week_10 <- kenya %>%
 
 * Calculate RMSE using the metrics() argument.
 
+```{r}
+
+tidy_model <- workflow() %>%
+  add_recipe(recipe(data = week_10, 
+                    reg_chg ~ treatment + poverty_n)) %>%
+  step_interact(~treatment*poverty_n) %>%
+  add_model(linear_reg() %>%
+              set_engine("stan") %>%
+              set_mode("regression"))
+
+tidy_model %>%
+  fit(week_10) %>%
+  predict(new_data = week_10)
+
+tibble(reality = week_10$reg_chg) %>%
+  bind_cols(guess) %>%
+  mutate(sq_diff = (.pred - reality)^2) %>%
+  summarize(rmse = sqrt(mean(sq_diff)))
+
+finds_rmse_metrics <- tibble(reality = week_10$reg_chg) %>%
+  bind_cols(guess) %>%
+  metrics(truth = reality, estimate = `.pred`)
+find_rmse_metrics
+```
 
 
 ## Scene 3
@@ -61,6 +105,14 @@ week_10 <- kenya %>%
 **Prompt:** The key problem with this analysis is that we have used the same data to *fit* the model as we are using to *evaluate* the model. This is very, very dangerous. We don't really care how well the model works on data we have already seen. We have the data itself! We care about the future, when we don't know the answer already. *The main purpose of tidymodels is to make it easy to estimate how well our model will work in the future.*
 
 * Create 4 objects: split, train, test and folds data, just as we do in chapter 10.
+
+```{r}
+
+set.seed(10)
+week10_split <- initial_split(week_10, prob = .80)
+
+```
+
 
 * Using the same model as in the previous scene, use cross-validation and report the average RMSE over the assessment samples. Hint: `collect_metrics()`.
 

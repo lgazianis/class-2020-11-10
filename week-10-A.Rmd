@@ -35,11 +35,13 @@ week_10 <- kenya %>%
 **Prompt:** How do we choose between competing models? First, we need to have a sense of what makes one model "better" than another. There is no single answer, but the most popular approach is to see how well the model's predictions match the truth.
 
 
-* Fit the same stan_glm() model which we used on Thursday: `reg_chg` as a function of `treatment`, `poverty_n` and their interaction. Look at the results. Write a sentence interpreting sigma.
+* Fit the same stan_glm() model which we used on Thursday: `reg_chg` as a function of `treatment`, `poverty_n` and their interaction. Look at the results. 
 
 * The root mean square error (also known as RMSE or rmse) is the most common measure for how well a models fits the data. It is the square root of the average of the sum of the residuals squared. (Recall that the residual is defined as the true value minus the fitted value.) Calculate the RMSE by hand. (Hint: Use the `predict()` function with the fitted model object. This will give you the fitted values. Once you have the residual, you just square them, take the sum, and then take the square root of the sum.)
 
 * Write a sentence or two describing a situation in which RMSE would not be a good metric for choosing among models.
+
+* Write a sentence interpreting sigma. 
 
 
 
